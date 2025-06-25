@@ -3,10 +3,14 @@ import init, { decrypt_csv, encrypt_csv, generate_key_iv } from "./pkg/rust_cryp
 await init();
 
 function readCSVFile() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const file = document.getElementById("csvFile").files[0];
+    if (!file) {
+      return reject(new Error("No file selected."));
+    }
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error); // Handle potential read errors
     reader.readAsText(file);
   });
 }
@@ -68,7 +72,7 @@ function checkFields() {
   const ivInput = document.getElementById("iv");
   const fieldsInput = document.getElementById("fields");
 
-  const file = fileInput.files.length > 0;  
+  const file = fileInput.files.length > 0;
   const key = keyInput.value.trim().length > 0;
   const iv = ivInput.value.trim().length > 0;
   const fields = fieldsInput.value.trim().length > 0;
